@@ -5,18 +5,18 @@
 //
 //
 
-@interface NFUIAnimatedPlayButton : UIControl
+@interface NFUIStackButton : UIControl
 @end
 
-@interface NFUIPlayerControlsMainView : UIView
-@property(nonatomic) __weak NFUIAnimatedPlayButton *playPauseButton;
+@interface NFUIPlayerControlsFooterViewRefresh : UIView
+@property(nonatomic) __weak NFUIStackButton *audioSubtitlesButton;
 @end
 
 @interface NFUIPlayerControlsRefreshViewController : UIViewController
-@property(retain, nonatomic) NFUIPlayerControlsMainView *mainControlsView;
+@property(retain, nonatomic) NFUIPlayerControlsFooterViewRefresh *footerControlsView;
 @end
 
-@interface NFUIPlayerController : NSObject
+@interface NFPlayerBase : NSObject
 - (void)percentSubtitleFontSize:(double)arg1;
 @end
 
@@ -56,7 +56,7 @@ static void setSubtitleFontSize(CGFloat fontSize)
     [prefs writeToFile:getSettingsPath() atomically:YES];
 }
 
-%hook NFUIPlayerController
+%hook NFPlayerBase
 
 - (void)play
 {
@@ -69,18 +69,18 @@ static void setSubtitleFontSize(CGFloat fontSize)
 
 %hook NFUIPlayerControlsRefreshViewController
 
-- (void)initMainControlsView
+- (void)initFooterControlsView
 {
     %orig;
 
     // add a long press gesture recognizer to the play/pause button
-    UILongPressGestureRecognizer *longPressGestureRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(NSFplayPauseButtonLongPress:)];
+    UILongPressGestureRecognizer *longPressGestureRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(NSFAudioSubtitlesButtonLongPress:)];
     longPressGestureRecognizer.minimumPressDuration = 1.0;
-    [self.mainControlsView.playPauseButton addGestureRecognizer:longPressGestureRecognizer];
+    [self.footerControlsView.audioSubtitlesButton addGestureRecognizer:longPressGestureRecognizer];
 }
 
 %new
-- (void)NSFplayPauseButtonLongPress:(UILongPressGestureRecognizer *)longPressGestureRecognizer
+- (void)NSFAudioSubtitlesButtonLongPress:(UILongPressGestureRecognizer *)longPressGestureRecognizer
 {
     if (longPressGestureRecognizer.state == UIGestureRecognizerStateBegan) {
         UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Subtitle Font Size"
@@ -100,7 +100,7 @@ static void setSubtitleFontSize(CGFloat fontSize)
             CGFloat fontSize = [inputTextField.text floatValue];
             if (inputTextField.text.length == 0) {
                 setSubtitleFontSize(kNSFDefaultSubtitleFontSize);
-            } else if (fontSize > kNSFMinimumSubtitleFontSize) {
+            } else if (fontSize >= kNSFMinimumSubtitleFontSize) {
                 setSubtitleFontSize(fontSize);
             }
         }]];

@@ -1,7 +1,7 @@
 Package: com.joshuaseltzer.netflixsubtitlefix
 Name: NetflixSubtitleFix
 Depends: mobilesubstrate
-Version: 1.0.0
+Version: 1.0.1
 Architecture: iphoneos-arm
 Description: Sets the subtitles on the Netflix iOS app to a fixed font percentage.  Confirmed working with Netflix 12.26.0.
 Maintainer: Joshua Seltzer <joshua.seltzer90@gmail.com>
